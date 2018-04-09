@@ -179,7 +179,7 @@ function kahuna_lpboxes( $sid = 1 ) {
 					 'kahuna_lpboxlength' . $sid,
 				 )
 			 );
-	if ( ( $options['kahuna_lpboxcount' . $sid] <= 0 ) || ( $options['kahuna_lpboxcat' . $sid] == '-' ) ) return;
+	if ( ( $options['kahuna_lpboxcount' . $sid] <= 0 ) || ( $options['kahuna_lpboxcat' . $sid] == '-1' ) ) return;
 
  	$box_counter = 1;
 	$animated_class = "";
@@ -241,10 +241,10 @@ endif;
 if ( ! function_exists( 'kahuna_lpbox_output' ) ):
 function kahuna_lpbox_output( $data ) {
 	$randomness = array ( 6, 8, 1, 5, 2, 7, 3, 4 );
-	foreach ( $data as $key => $value ) { ${"$key"} = $value; } ?>
+	extract($data); ?>
 			<div class="lp-box box<?php echo absint( $colno ); ?> ">
 					<div class="lp-box-image lpbox-rnd<?php echo $randomness[$colno%8]; ?>">
-                        <a class="lp-box-imagelink" href="<?php if( ! empty( $link ) ) { echo esc_url( $link ); } ?>" <?php echo esc_attr( $target ); ?>></a>
+                        <a class="lp-box-imagelink" <?php if( ! empty( $link ) ) { ?> href="<?php echo esc_url( $link ); ?>" <?php echo esc_attr( $target ); } ?>></a>
 						<?php if( ! empty( $image ) ) { ?><img alt="<?php echo esc_attr( $title ) ?>" src="<?php echo esc_url( $image ) ?>" /> <?php } ?>
                         <span class="box-overlay"></span>
 					</div>

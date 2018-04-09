@@ -12,15 +12,20 @@ function cryout_ajax_init() {
 	$identifiers = cryout_get_theme_structure( 'theme_identifiers' );
 	// loading theme settings
 	$options = cryout_get_option( array(
-		_CRYOUT_THEME_NAME . '_landingpage',
-		_CRYOUT_THEME_NAME . '_frontpostscount'
+		cryout_sanitize_tnp(_CRYOUT_THEME_NAME) . '_landingpage',
+		cryout_sanitize_tnp(_CRYOUT_THEME_NAME) . '_lppostscount'
 	) );
 
-	if( is_front_page() && cryout_is_true( $options[_CRYOUT_THEME_NAME . '_landingpage'] ) ) {
+	if( is_front_page() && cryout_is_true( $options[cryout_sanitize_tnp(_CRYOUT_THEME_NAME) . '_landingpage'] ) ) {
 		$paged = ( get_query_var('paged') ) ? get_query_var('paged') : 1;
 		$the_query = new WP_Query(
-				array( 'posts_per_page' => $options[_CRYOUT_THEME_NAME . '_frontpostscount'], 'paged' => $paged )
-				);
+			apply_filters( 'cryout_landingpage_indexquery', 
+				array( 
+					'posts_per_page' => $options[cryout_sanitize_tnp(_CRYOUT_THEME_NAME) . '_lppostscount'], 
+					'paged' => $paged 
+				)
+			)
+		);
 	} else {
 		return;
 	}
@@ -56,41 +61,6 @@ function cryout_ajax_init() {
 } // cryout_ajax_init()
 endif;
 
-if ( ! function_exists( 'cryout_query_offset' ) ):
-function cryout_query_offset(&$query) {
-
-	$options = cryout_get_option( array(
-		_CRYOUT_THEME_NAME . '_frontpage',
-		_CRYOUT_THEME_NAME . '_frontpostscount'
-	) );
-
-	if ( !is_front_page() || !cryout_is_true($options[_CRYOUT_THEME_NAME . '_frontpage']) )  {
-		return;
-	}
-
-    //Determine how many posts per page you want (we'll use WordPress's settings)
-    $ppp = $options[_CRYOUT_THEME_NAME . '_frontpostscount'];
-
-    //Detect and handle pagination...
-    if ( $query->is_paged ) {
-
-        //Manually determine page query offset (offset + current page (minus one) x posts per page)
-        $page_offset =  ($query->query_vars['paged']-1) * $ppp ;
-
-        //Apply adjust page offset
-        $query->set('offset', $page_offset );
-
-    }
-    else {
-
-        //This is the first page. No offset
-        $query->set('offset',0);
-
-    }
-} // cryout_query_offset()
-endif;
-
-//if ( 'posts' == get_option( 'show_on_front' )) add_action( 'pre_get_posts', 'cryout_query_offset', 1 );
 if ( 'posts' == get_option( 'show_on_front' )) add_action( 'template_redirect', 'cryout_ajax_init' );
 
 // FIN

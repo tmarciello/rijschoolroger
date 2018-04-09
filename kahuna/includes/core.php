@@ -11,22 +11,25 @@
   */
 if ( ! function_exists( 'kahuna_content_width' ) ) :
 function kahuna_content_width() {
-   global $content_width;
-   $deviation = 0.80;
+	global $content_width;
+	$deviation = 0.80;
 
-   $options = cryout_get_option( array(
-       'kahuna_sitelayout', 'kahuna_landingpage', 'kahuna_magazinelayout', 'kahuna_sitewidth', 'kahuna_primarysidebar', 'kahuna_secondarysidebar',
+	$options = cryout_get_option( array(
+		'kahuna_sitelayout', 'kahuna_landingpage', 'kahuna_magazinelayout', 'kahuna_sitewidth', 'kahuna_primarysidebar', 'kahuna_secondarysidebar',
    ) );
 
-   $content_width = 0.98 * (int)$options['kahuna_sitewidth'];
+	$content_width = 0.98 * (int)$options['kahuna_sitewidth'];
 
-   switch( $options['kahuna_sitelayout'] ) {
-       case '2cSl': case '3cSl': case '3cSr': case '3cSs': $content_width -= (int)$options['kahuna_primarysidebar']; // primary sidebar
-       case '2cSr': case '3cSl': case '3cSr': case '3cSs': $content_width -= (int)$options['kahuna_secondarysidebar']; break; // secondary sidebar
-   }
+	switch( $options['kahuna_sitelayout'] ) {
+		case '2cSl': case '3cSl': case '3cSr': case '3cSs': $content_width -= (int)$options['kahuna_primarysidebar']; // primary sidebar
+		case '2cSr': case '3cSl': case '3cSr': case '3cSs': $content_width -= (int)$options['kahuna_secondarysidebar']; break; // secondary sidebar
+	}
 
-   if ( is_front_page() && $options['kahuna_landingpage'] ) {
-       // landing page could be a special case;
+	if ( is_front_page() && $options['kahuna_landingpage'] ) {
+		// landing page could be a special case;
+		$width = ceil( (int)$content_width / apply_filters('kahuna_lppostslayout_filter', (int)$options['kahuna_magazinelayout']) );
+		$content_width = ceil($width);
+		return;
    }
 
    if ( ! is_singular() ) {
@@ -48,33 +51,34 @@ endif;
 if ( ! function_exists( 'kahuna_featured_width' ) ) :
 function kahuna_featured_width() {
 
-   $options = cryout_get_option( array(
-       'kahuna_sitelayout', 'kahuna_landingpage', 'kahuna_magazinelayout', 'kahuna_sitewidth', 'kahuna_primarysidebar', 'kahuna_secondarysidebar',
-       'kahuna_lplayout',
-   ) );
+	$options = cryout_get_option( array(
+		'kahuna_sitelayout', 'kahuna_landingpage', 'kahuna_magazinelayout', 'kahuna_sitewidth', 'kahuna_primarysidebar', 'kahuna_secondarysidebar',
+		'kahuna_lplayout',
+	) );
 
-   $width = (int)$options['kahuna_sitewidth'];
+	$width = (int)$options['kahuna_sitewidth'];
 
-   $deviation = 0.02 * $width; // content to sidebar(s) margin
+	$deviation = 0.02 * $width; // content to sidebar(s) margin
 
-   switch( $options['kahuna_sitelayout'] ) {
-       case '2cSl': case '3cSl': case '3cSr': case '3cSs': $width -= (int)$options['kahuna_primarysidebar'] + $deviation; // primary sidebar
-       case '2cSr': case '3cSl': case '3cSr': case '3cSs': $width -= (int)$options['kahuna_secondarysidebar'] + $deviation; break; // secondary sidebar
-   }
+	switch( $options['kahuna_sitelayout'] ) {
+		case '2cSl': case '3cSl': case '3cSr': case '3cSs': $width -= (int)$options['kahuna_primarysidebar'] + $deviation; // primary sidebar
+		case '2cSr': case '3cSl': case '3cSr': case '3cSs': $width -= (int)$options['kahuna_secondarysidebar'] + $deviation; break; // secondary sidebar
+	}
 
-   if ( is_front_page() && $options['kahuna_landingpage'] ) {
-       // landing page is a special case
-       $width = ceil( (int)$options['kahuna_sitewidth'] / (int)$options['kahuna_magazinelayout'] );
-   }
+	if ( is_front_page() && $options['kahuna_landingpage'] ) {
+		// landing page is a special case
+		$width = ceil( (int)$options['kahuna_sitewidth'] / apply_filters('kahuna_lppostslayout_filter', (int)$options['kahuna_magazinelayout'] ) );
+		return ceil($width);
+	}
 
-   if ( ! is_singular() ) {
-       switch ( $options['kahuna_magazinelayout'] ):
-           case 2: $width = ceil($width*0.94/2); break; // magazine-two
-           case 3: $width = ceil($width*0.88/3); break; // magazine-three
-       endswitch;
-   };
+	if ( ! is_singular() ) {
+		switch ( $options['kahuna_magazinelayout'] ):
+			case 2: $width = ceil($width*0.94/2); break; // magazine-two
+			case 3: $width = ceil($width*0.88/3); break; // magazine-three
+		endswitch;
+	};
 
-   return ceil($width);
+	return ceil($width);
 
 } // kahuna_featured_width()
 endif;
@@ -138,13 +142,25 @@ endif;
 
 if ( ! function_exists( 'kahuna_header_title_check' ) ) :
 function kahuna_header_title_check() {
-    $options = cryout_get_option( array( 'kahuna_headertitles_posts', 'kahuna_headertitles_pages', 'kahuna_headertitles_archives', 'kahuna_headertitles_home'  ) );
-    if ( ( is_single() && $options['kahuna_headertitles_posts'] ) ||
-    ( is_page() && $options['kahuna_headertitles_pages'] ) ||
+    $options = cryout_get_option( array( 'kahuna_headertitles_posts', 'kahuna_headertitles_pages', 'kahuna_headertitles_archives', 'kahuna_headertitles_home' ) );
+
+	// woocommerce should never use header titles
+	if (function_exists('is_woocommerce') && is_woocommerce()) return false;
+
+	// theme's landing page
+	if ( cryout_on_landingpage() && $options['kahuna_headertitles_home'] ) return true;
+
+	// blog section
+	if ( is_home() && $options['kahuna_headertitles_home'] ) return true;
+
+	// other instances
+	if ( ( is_single() && $options['kahuna_headertitles_posts'] ) ||
+    ( is_page() && $options['kahuna_headertitles_pages'] && ! cryout_on_landingpage() ) ||
     ( ( is_archive() || is_search() || is_404() ) && $options['kahuna_headertitles_archives'] ) ||
     ( ( is_home() ) && $options['kahuna_headertitles_home'] ) ) {
         return true;
     }
+	return false;
 } //kahuna_header_title_check
 endif;
 
@@ -159,11 +175,14 @@ function kahuna_header_title() {
         <div id="header-page-title-inside">
             <?php if ( is_singular() )  {
                 the_title( '<h1 class="entry-title" ' . cryout_schema_microdata('entry-title', 0) . '>', '</h1>' );
-                } elseif ( is_home() ) {
+                } elseif ( is_home() && is_front_page() ) {
                     echo '<h1 class="entry-title" ' . cryout_schema_microdata('entry-title', 0) . '>' . esc_attr( get_bloginfo( 'name', 'display' ) ) . '</h1><p class="byline">' . esc_attr( get_bloginfo( 'description', 'display' ) ) . '</p>';
                 } else {
                     echo '<h1 class="entry-title" ' . cryout_schema_microdata('entry-title', 0) . '>';
-                    if ( is_archive() ) {
+					if ( is_home() ) {
+						single_post_title();
+					}
+					if ( is_archive() ) {
                         echo get_the_archive_title();
                     }
                     if ( is_search() ) {
@@ -174,11 +193,6 @@ function kahuna_header_title() {
                     }
                     echo '</h1>';
             } ?>
-            <?php /*
-            <div class="entry-meta aftertitle-meta">
-                <?php cryout_post_meta_hook(); ?>
-            </div>
-            */?>
             <?php cryout_breadcrumbs_hook();?>
         </div>
     </div> <?php endif;
@@ -304,7 +318,7 @@ function kahuna_copyright() {
 if ( ! function_exists( 'kahuna_get_sidebar' ) ) :
 function kahuna_get_sidebar() {
 	global $post;
-	if ( get_post() ) { $kahuna_meta_layout = get_post_meta( $post->ID, '_kahuna_layout', true ); }
+	if ( get_post() && is_singular() ) { $kahuna_meta_layout = get_post_meta( $post->ID, '_kahuna_layout', true ); }
 
 	if ( isset( $kahuna_meta_layout ) && $kahuna_meta_layout ) {
 		$kahuna_sitelayout =  $kahuna_meta_layout;

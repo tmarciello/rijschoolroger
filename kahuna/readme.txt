@@ -1,12 +1,12 @@
 =============
 Kahuna WordPress Theme
-Copyright 2017 Cryout Creations
+Copyright 2017-18 Cryout Creations
 https://www.cryoutcreations.eu/
 
 Author: Cryout Creations
 Requires at least: 4.2
-Tested up to: 4.9.1
-Stable tag: 1.0.1
+Tested up to: 4.9.4
+Stable tag: 1.1.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl.html
 Donate link: https://www.cryoutcreations.eu/donate/
@@ -87,6 +87,43 @@ The rest of the bundled images are created by Cryout Creations and released with
 
 
 == Changelog ==
+
+= 1.1.2 =
+* Fixed landing page featured boxes not being disable-able due to incorrect check
+* Fixed incorrect menu items alignment on RTL languages
+
+= 1.1.1 =
+* Adjusted font size for masonry article titles (made them smaller)
+* Fixed content breadcrumbs missing background color
+* Fixed header widget area overlapping header titles
+* Removed 'defer' loading of comments script
+
+= 1.1.0 =
+* Improved featured image srcset functionality to support more browsers and usage scenarios
+* Improved edit button text color styling for dark backgrounds
+* Improved compatibility of dark color schemes with Crayon Syntax Highlighter plugin's editor styling
+* Improved 'comments moderated' text positioning
+* Improved demo content check to use theme slug
+* Improved sublists appearance in sidebar widgets
+* Added all weight values for the typography options
+* Added icon to comments reply button
+* Added icon to excerpt read more button
+* Changed featured image icon to arrow
+* Relocated Header Titles options panel under General
+* Fixed non working translation in article publish date
+* Fixed page layout option overlapping category/search/archive layout when last item uses custom layout
+* Fixed and disabled header titles functionality on WooCommerce sections
+* Fixed header titles not following the separate option on home static page
+* Fixed header titles to use the correct page title on the 'blog' section
+* Fixed comments block being visible on landing page featured page
+* Fixed missing saturation animation for cropped featured images
+* Fixed site title and tagline animation
+* Removed header image blur effect as it was malfunctioning on Chrome
+* Removed leftover right margin from post tiles in lists
+* Improved headings titles handing of custom post types and content
+* Updated to Cryout Framework 0.7.3:
+	* Framework: fixed invalid count() call in prototypes.php triggering warnings on PHP 7+
+	* Framework: added cryout_get_picture(), cryout_get_picture_src(), cryout_is_landingpage(), cryout_on_landingpage() functions
 
 = 1.0.1 =
 * Fixed landing page static image responsiveness and improved compatibility with Serious Slider

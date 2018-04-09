@@ -35,9 +35,9 @@ function kahuna_demo_thumbnail( $input ) {
 // Check if running on the demo
 function kahuna_is_demo() {
 	$current_theme = wp_get_theme();
-	$theme_name = $current_theme->get( 'TextDomain' );
+	$theme_slug = $current_theme->Template;
 	$active_theme = kahuna_get_wp_option( 'template' );
-	return apply_filters( 'kahuna_is_demo', ( $active_theme != strtolower( $theme_name ) && ! is_child_theme() ) );
+	return apply_filters( 'kahuna_is_demo', ( $active_theme != strtolower( $theme_slug ) && ! is_child_theme() ) );
 } // kahuna_is_demo()
 
 // Read WordPress options

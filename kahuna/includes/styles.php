@@ -145,7 +145,7 @@ add_action( 'wp_footer', 'kahuna_scripts_method' );
  */
 function kahuna_scripts_filter($tag) {
 	$defer = cryout_get_option('kahuna_defer');
-    $scripts_to_defer = array( 'comment-reply.min.js', 'frontend.js', 'masonry.min.js' );
+    $scripts_to_defer = array( 'frontend.js', 'masonry.min.js' );
     foreach( $scripts_to_defer as $defer_script ) {
         if( (true == strpos( $tag, $defer_script )) && $defer )
             return str_replace( ' src', ' defer src', $tag ); // ' async defer src' causes issues with masonry

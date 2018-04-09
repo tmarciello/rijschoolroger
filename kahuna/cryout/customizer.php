@@ -110,6 +110,13 @@ function cryout_customizer_extras($wp_customize){
 			}
 	} // class Cryout_Customize_Blank_Control
 
+	class Cryout_Customize_Null_Control extends WP_Customize_Control {
+			public $type = NULL;
+			public function render_content() {
+				return;
+			}
+	} // class Cryout_Customize_Null_Control
+
 
 	class Cryout_Customize_Font_Control extends WP_Customize_Control {
 			public $type = 'font';
@@ -262,6 +269,35 @@ function cryout_customizer_extras($wp_customize){
 			}
 	} // class Cryout_Customize_RadioImage_Control
 
+	class Cryout_Customize_OptSelect_Control extends WP_Customize_Control {
+			public $type = 'optselect';
+			public function render_content() {
+				if ( empty( $this->choices ) )
+					return;
+				?>
+				<label>
+					<?php if ( ! empty( $this->label ) ) : ?>
+						<span class="customize-control-title"><?php echo esc_html( $this->label ); ?></span>
+					<?php endif;
+					if ( ! empty( $this->description ) ) : ?>
+						<span class="description customize-control-description"><?php echo $this->description; ?></span>
+					<?php endif; ?>
+
+					<select <?php $this->link(); ?>>
+					<?php if (!empty($this->input_attrs['disabled'])) { ?><option value="0"><?php echo esc_attr($this->input_attrs['disabled']); ?></option><?php } ?>
+						<?php
+						foreach ( $this->choices as $optgroup_id => $optgroup ) {
+							echo '<optgroup label="' . $optgroup_id . '">';
+							foreach ( $optgroup as $value => $label )
+								echo '<option value="' . esc_attr( $value ) . '"' . selected( $this->value(), $value, false ) . '>' . $label . '</option>';
+							echo '</optgroup>';
+						} ?>
+					</select>
+				</label>
+				<?php
+			} // render_content
+	} // Cryout_Customize_OptSelect_Control
+
 	class Cryout_Customize_IconSelect_Control extends WP_Customize_Control {
 			public $type = 'iconselect';
 			public function render_content() {
@@ -370,18 +406,19 @@ class Cryout_Customizer {
 				'panel'  		 => ($section['sid']?'cryout-' . $section['sid']:''),
 			) );
 
-			$wp_customize->add_setting( 'placeholder_'.$section_priority, array(
+			/*$wp_customize->add_setting( 'placeholder_'.$section_priority, array(
 				'default'        => '',
 				'capability'     => 'edit_theme_options',
-				'sanitize_callback' => 'cryout_customizer_sanitize_blank'
-			) );
+				'sanitize_callback' => 'cryout_customizer_sanitize_blank',
+				'section' 		 => 'cryout-' . $section['id'],
+			) );*/
 
 			// override section id to make it uniquely identifiable
-			$wp_customize->add_control( new Cryout_Customize_Blank_Control( $wp_customize, 'placeholder_'.$section_priority, array(
+			/*$wp_customize->add_control( new Cryout_Customize_Blank_Control( $wp_customize, 'placeholder_'.$section_priority, array(
 				'section' => 'cryout-' . $section['id'],
 				'settings'   => 'placeholder_'.$section_priority,
 				'priority'   => 10,
-			) ) );
+			) ) );*/
 
 		endforeach;
 		////////// end option panels/sections
@@ -424,6 +461,8 @@ class Cryout_Customizer {
 
 		endforeach;  // overrides
 
+		// options priority start point
+		$priority = 10;
 
 		////////// add custom theme option controls, based on option type //////////
 		foreach ($cryout_theme_settings['options'] as $opt):
@@ -464,6 +503,8 @@ class Cryout_Customizer {
 				default: 				$sanitize_callback = 'cryout_customizer_sanitize_generic';		break;
 			endswitch;
 
+			$sanitize_callback = apply_filters( 'cryout_customizer_custom_control_sanitize_callback', $sanitize_callback, $opt['id'] );
+			
 			// remember placeholder id and section for the cloning cycle below
 			$_opt_id = $opt['id'];
 			$_opt_section = $opt['section'];
@@ -503,49 +544,62 @@ class Cryout_Customizer {
 					case 'checkbox':
 						$wp_customize->add_control( $opid, array(
 							'label'		=> $opt['label'],
-							'description'	=> $opt['desc'],
+							'description'	=> (isset($opt['desc'])?$opt['desc']:''),
 							'section'	=> $opt['section'],
 							'settings'	=> $opid,
 							'input_attrs' => (!empty($opt['input_attrs'])?$opt['input_attrs']:array()),
 							'type'		=> $opt['type'],
-							'priority'	=> (isset($opt['priority'])?$opt['priority']:2),
+							'priority'	=> (isset($opt['priority'])?$opt['priority']:$priority),
 							'active_callback' => ( (isset($opt['active_callback'])) ? $opt['active_callback'] : NULL),
 						) );
 						break;
 					case 'googlefont':
 						$wp_customize->add_control( $opid, array(
 							'label'		=> $opt['label'],
-							'description'	=> $opt['desc'],
+							'description'	=> (isset($opt['desc'])?$opt['desc']:''),
 							'section'	=> $opt['section'],
 							'settings'	=> $opid,
 							'input_attrs' => (!empty($opt['input_attrs'])?$opt['input_attrs']:array()),
 							'type'		=> 'text',
-							'priority'	=> (isset($opt['priority'])?$opt['priority']:2),
+							'priority'	=> (isset($opt['priority'])?$opt['priority']:$priority),
 							'active_callback' => ( (isset($opt['active_callback'])) ? $opt['active_callback'] : NULL),
 						) );
 						break;
 					case 'radio':
 					case 'select':
-						if (empty($opt['labels'])) $opt['labels'] = $opt['values'];
+						if (empty($opt['choices']) && empty($opt['labels'])) $opt['labels'] = $opt['values'];
 						$wp_customize->add_control( $opid, array(
 							'label'		=> $opt['label'],
-							'description'	=> $opt['desc'],
+							'description'	=> (isset($opt['desc'])?$opt['desc']:''),
 							'section'	=> $opt['section'],
 							'settings'	=> $opid,
 							'type'		=> $opt['type'],
-							'priority'	=> (isset($opt['priority'])?$opt['priority']:2),
+							'priority'	=> (isset($opt['priority'])?$opt['priority']:$priority),
 							'choices'	=> (isset($opt['choices'])?$opt['choices']:array_combine($opt['values'],$opt['labels'])),
 							'active_callback' => ( (isset($opt['active_callback'])) ? $opt['active_callback'] : NULL),
 						) );
 						break;
+					case 'optselect':
+						$wp_customize->add_control( new Cryout_Customize_OptSelect_Control( $wp_customize, $opid, array(
+							'label' 	=> $opt['label'],
+							'description'	=> (isset($opt['desc'])?$opt['desc']:''),
+							'section'	=> $opt['section'],
+							'settings'	=> $opid,
+							'input_attrs'	=> (isset($opt['disabled'])?array('disabled'=>$opt['disabled']):array('disabled'=>false)),
+							'priority'	=> (isset($opt['priority'])?$opt['priority']:$priority),
+							'choices'	=> (isset($opt['choices'])?$opt['choices']:array_combine($opt['values'],$opt['labels'])),
+							'disabled'	=> (isset($opt['disabled'])?$opt['disabled']:''),
+							'active_callback' => ( (isset($opt['active_callback'])) ? $opt['active_callback'] : NULL),
+						) ) );
+						break;
 					case 'range':
 						$wp_customize->add_control( $opid, array(
 							'label'		=> $opt['label'],
-							'description'	=> $opt['desc'],
+							'description'	=> (isset($opt['desc'])?$opt['desc']:''),
 							'section'	=> $opt['section'],
 							'settings'	=> $opid,
 							'type'		=> $opt['type'],
-							'priority'	=> (isset($opt['priority'])?$opt['priority']:2),
+							'priority'	=> (isset($opt['priority'])?$opt['priority']:$priority),
 							'input_attrs' => array( 'min' => $opt['min'], 'max' => $opt['max'], 'step' => (isset($opt['step'])?$opt['step']:10) ),
 							'active_callback' => ( (isset($opt['active_callback'])) ? $opt['active_callback'] : NULL),
 						) );
@@ -553,11 +607,11 @@ class Cryout_Customizer {
 					case 'slider':
 						$wp_customize->add_control(  new Cryout_Customize_Slider_Control( $wp_customize, $opid, array(
 							'label'		=> $opt['label'],
-							'description'	=> $opt['desc'],
+							'description'	=> (isset($opt['desc'])?$opt['desc']:''),
 							'section'	=> $opt['section'],
 							'settings'	=> $opid,
 							'type'		=> $opt['type'],
-							'priority'	=> (isset($opt['priority'])?$opt['priority']:2),
+							'priority'	=> (isset($opt['priority'])?$opt['priority']:$priority),
 							'input_attrs' => array(
 										'min' => $opt['min'],
 										'max' => $opt['max'],
@@ -570,11 +624,11 @@ class Cryout_Customizer {
 					case 'slidertwo':
 						$wp_customize->add_control(  new Cryout_Customize_SliderTwo_Control( $wp_customize, $opid, array(
 							'label'		=> $opt['label'],
-							'description'	=> $opt['desc'],
+							'description'	=> (isset($opt['desc'])?$opt['desc']:''),
 							'section'	=> $opt['section'],
 							'settings'	=> $opid,
 							'type'		=> $opt['type'],
-							'priority'	=> (isset($opt['priority'])?$opt['priority']:2),
+							'priority'	=> (isset($opt['priority'])?$opt['priority']:$priority),
 							'input_attrs' => array(
 										'min' => $opt['min'],
 										'max' => $opt['max'],
@@ -588,58 +642,73 @@ class Cryout_Customizer {
 					case 'radioimage':
 						$wp_customize->add_control( new Cryout_Customize_RadioImage_Control( $wp_customize, $opid, array(
 							'label'		=> $opt['label'],
-							'description'	=> $opt['desc'],
+							'description'	=> (isset($opt['desc'])?$opt['desc']:''),
 							'section'	=> $opt['section'],
 							'settings'	=> $opid,
 							'type'		=> $opt['type'],
-							'priority'	=> (isset($opt['priority'])?$opt['priority']:2),
+							'priority'	=> (isset($opt['priority'])?$opt['priority']:$priority),
 							'choices' 	=> (isset($opt['choices'])?$opt['choices']:array_combine($opt['values'],$opt['labels'])),
 							'active_callback' => ( (isset($opt['active_callback'])) ? $opt['active_callback'] : NULL),
 						) ) );
 						break;
+					case 'sortable':
+						if (class_exists('Cryout_Customize_Sortable_Control')) {
+							$wp_customize->add_control( new Cryout_Customize_Sortable_Control( $wp_customize, $opid, array(
+								'label'		=> $opt['label'],
+								'description'	=> (isset($opt['desc'])?$opt['desc']:''),
+								'section'	=> $opt['section'],
+								'settings'	=> $opid,
+								'type'		=> $opt['type'],
+								'priority'	=> (isset($opt['priority'])?$opt['priority']:$priority),
+								'choices' 	=> (isset($opt['choices'])?$opt['choices']:array_combine($opt['values'],$opt['labels'])),
+								'input_attrs' => (!empty($opt['input_attrs'])?$opt['input_attrs']:array()),
+								'active_callback' => ( (isset($opt['active_callback'])) ? $opt['active_callback'] : NULL),
+							) ) );
+						}
+						break;
 					case 'color':
 						$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, $opid, array(
 							'label' 	=> $opt['label'],
-							'description'	=> $opt['desc'],
+							'description'	=> (isset($opt['desc'])?$opt['desc']:''),
 							'section'	=> $opt['section'],
-							'priority'	=> (isset($opt['priority'])?$opt['priority']:2),
+							'priority'	=> (isset($opt['priority'])?$opt['priority']:$priority),
 							'active_callback' => ( (isset($opt['active_callback'])) ? $opt['active_callback'] : NULL),
 						) ) );
 						break;
 					case 'font':
 						$wp_customize->add_control( new Cryout_Customize_Font_Control( $wp_customize, $opid, array(
 							'label' 	=> $opt['label'],
-							'description'	=> $opt['desc'],
+							'description'	=> (isset($opt['desc'])?$opt['desc']:''),
 							'section'	=> $opt['section'],
-							'priority'	=> (isset($opt['priority'])?$opt['priority']:2),
+							'priority'	=> (isset($opt['priority'])?$opt['priority']:$priority),
 							'active_callback' => ( (isset($opt['active_callback'])) ? $opt['active_callback'] : NULL),
 						) ) );
 						break;
 					case 'iconselect':
 						$wp_customize->add_control( new Cryout_Customize_IconSelect_Control( $wp_customize, $opid, array(
 							'label' 	=> $opt['label'],
-							'description'	=> $opt['desc'],
+							'description'	=> (isset($opt['desc'])?$opt['desc']:''),
 							'section'	=> $opt['section'],
-							'priority'	=> (isset($opt['priority'])?$opt['priority']:2),
+							'priority'	=> (isset($opt['priority'])?$opt['priority']:$priority),
 							'active_callback' => ( (isset($opt['active_callback'])) ? $opt['active_callback'] : NULL),
 						) ) );
 						break;
 					case 'media-image':
 						$wp_customize->add_control( new WP_Customize_Media_Control( $wp_customize, $opid, array(
 							'label' 	=> $opt['label'],
-							'description'	=> $opt['desc'],
+							'description'	=> (isset($opt['desc'])?$opt['desc']:''),
 							'section'	=> $opt['section'],
 							'mime_type'	=> 'image',
-							'priority'	=> (isset($opt['priority'])?$opt['priority']:2),
+							'priority'	=> (isset($opt['priority'])?$opt['priority']:$priority),
 							'active_callback' => ( (isset($opt['active_callback'])) ? $opt['active_callback'] : NULL),
 						) ) );
 						break;
 					case 'media':
 						$wp_customize->add_control( new WP_Customize_Media_Control( $wp_customize, $opid, array(
 							'label' 	=> $opt['label'],
-							'description'	=> $opt['desc'],
+							'description'	=> (isset($opt['desc'])?$opt['desc']:''),
 							'section'	=> $opt['section'],
-							'priority'	=> (isset($opt['priority'])?$opt['priority']:2),
+							'priority'	=> (isset($opt['priority'])?$opt['priority']:$priority),
 							'active_callback' => ( (isset($opt['active_callback'])) ? $opt['active_callback'] : NULL),
 						) ) );
 						break;
@@ -650,7 +719,7 @@ class Cryout_Customizer {
 							'section'	=> $opt['section'],
 							'settings'	=> $opid,
 							'input_attrs' => (!empty($opt['input_attrs'])?$opt['input_attrs']:array()),
-							'priority'	=> (isset($opt['priority'])?$opt['priority']:2),
+							'priority'	=> (isset($opt['priority'])?$opt['priority']:$priority),
 							'active_callback' => ( (isset($opt['active_callback'])) ? $opt['active_callback'] : NULL),
 						) ) );
 						break;					
@@ -661,25 +730,31 @@ class Cryout_Customizer {
 							'section'	=> $opt['section'],
 							'settings'	=> $opid,
 							'input_attrs' => (!empty($opt['input_attrs'])?$opt['input_attrs']:array()),
-							'priority'	=> (isset($opt['priority'])?$opt['priority']:2),
+							'priority'	=> (isset($opt['priority'])?$opt['priority']:$priority),
 							'active_callback' => ( (isset($opt['active_callback'])) ? $opt['active_callback'] : NULL),
 						) ) );
 						break;
-
+					case NULL:
+						$wp_customize->add_control( new Cryout_Customize_Null_Control( $wp_customize, $opid ) );
+						break;
 					case 'blank':
 					default:
 						$wp_customize->add_control( new Cryout_Customize_Blank_Control( $wp_customize, $opid, array(
 							'label' 	=> $opt['label'],
-							'description'	=> $opt['desc'],
+							'description'	=> (isset($opt['desc'])?$opt['desc']:''),
 							'section'	=> $opt['section'],
 							'settings'	=> $opid,
-							'priority'	=> (isset($opt['priority'])?$opt['priority']:2),
+							'priority'	=> (isset($opt['priority'])?$opt['priority']:$priority),
 							'active_callback' => ( (isset($opt['active_callback'])) ? $opt['active_callback'] : NULL),
 						) ) );
 						break;
 				endswitch;
 
+			// increase priority for each option (including clones)
+			//$priority += 10;
+
 			} // end cloning for cycle
+
 
 		endforeach;
 		////////// end options sections

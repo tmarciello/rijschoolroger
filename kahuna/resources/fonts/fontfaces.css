@@ -52,7 +52,8 @@
 .icon-search:before { content: "\e949"; }
 .icon-pagination-right:before {  content: "\e914"; }
 .icon-pagination-left:before {  content: "\e913"; }
-.icon-continue-reading:before {  content: "\e917"; }
+.icon-continue-reading:before {  content: "\e902"; }
+.icon-fixed-nav:before {  content: "\e917"; }
 .icon-menu:before { content: "\e94c"; }
 .icon-cancel:before { content: "\e935"; }
 

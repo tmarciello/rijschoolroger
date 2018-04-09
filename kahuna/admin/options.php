@@ -160,6 +160,7 @@ $kahuna_big = array(
 	// general
 	array('id'=>'kahuna_contentstructure', 'title'=>__('Structure','kahuna'), 'callback'=>'', 'sid'=> 'kahuna_general_section'),
 	array('id'=>'kahuna_contentgraphics', 'title'=>__('Decorations','kahuna'), 'callback'=>'', 'sid'=> 'kahuna_general_section'),
+	array('id'=>'kahuna_headertitles', 'title'=>__('Header Titles','kahuna'), 'callback'=>'', 'sid'=> 'kahuna_general_section'),
 	array('id'=>'kahuna_postimage', 'title'=>__('Content Images','kahuna'), 'callback'=>'', 'sid'=> 'kahuna_general_section'),
 	array('id'=>'kahuna_searchbox', 'title'=>__('Search Box Locations','kahuna'), 'callback'=>'', 'sid'=> 'kahuna_general_section'),
 	array('id'=>'kahuna_socials', 'title'=>__('Social Icons','kahuna'), 'callback'=>'', 'sid'=>'kahuna_general_section'),
@@ -171,7 +172,6 @@ $kahuna_big = array(
 	// post info
 	array('id'=>'kahuna_featured', 'title'=>__('Featured Image', 'kahuna'), 'callback'=>'', 'sid'=>'kahuna_post_section'),
 	array('id'=>'kahuna_metas', 'title'=>__('Meta Information','kahuna'), 'callback'=>'', 'sid'=> 'kahuna_post_section'),
-	array('id'=>'kahuna_headertitles', 'title'=>__('Header Titles','kahuna'), 'callback'=>'', 'sid'=> 'kahuna_post_section'),
 	array('id'=>'kahuna_excerpts', 'title'=>__('Excerpts','kahuna'), 'callback'=>'', 'sid'=> 'kahuna_post_section'),
 	array('id'=>'kahuna_comments', 'title'=>__('Comments','kahuna'), 'callback'=>'', 'sid'=> 'kahuna_post_section'),
 	// post excerpt
@@ -294,12 +294,12 @@ $kahuna_big = array(
 		'type' => 'select',
 		'label' => __("Footer Widgets Columns","kahuna"),
 		'values' => array(0, 1, 2, 3, 4),
-		'labels' => array( 
+		'labels' => array(
 			__('All in a row','kahuna'),
 			__('1 Column','kahuna'),
 			__('2 Columns','kahuna'),
 			__('3 Columns','kahuna'),
-			__('4 Columns','kahuna') 
+			__('4 Columns','kahuna')
 		),
 		'desc' => '',
 	'section' => 'kahuna_layout' ),
@@ -365,7 +365,7 @@ $kahuna_big = array(
 	'id' => 'kahuna_headerresponsive',
 		'type' => 'select',
 		'values' => array( 0, 1 ),
-		'labels' => array( __("Cropped","kahuna"), __("Responsive","kahuna") ),
+		'labels' => array( __("Cropped","kahuna"), __("Contained","kahuna") ),
 		'label' => __('Header Image Behaviour','kahuna'),
 		'desc' => "",
 	'section' => 'kahuna_siteheader' ),
@@ -446,7 +446,7 @@ $kahuna_big = array(
 		'type' => 'select',
 		'label' => __('Slider','kahuna'),
 		'values' => array( 4, 2, 1, 3, 0 ),
-		'labels' => array( 
+		'labels' => array(
 			__("Serious Slider", "kahuna"),
 			__("Use Shortcode","kahuna"),
 			__("Static Image","kahuna"),
@@ -884,8 +884,8 @@ $kahuna_big = array(
 	'id' => 'kahuna_fgeneralweight',
 		'type' => 'select',
 		'label' => '',
-		'values' => array('300','400','700','800'),
-		'labels' => array( __('300 (ligher)','kahuna'), __('400 (normal)','kahuna'), __('700 (bold)','kahuna'), __('800 (bolder)','kahuna') ),
+		'values' => array('100', '200', '300', '400', '500', '600', '700', '800', '900'),
+		'labels' => array( __('100 thin','kahuna'), __('200 extra-light','kahuna'), __('300 ligher','kahuna'), __('400 regular','kahuna'), __('500 medium','kahuna'), __('600 semi-bold','kahuna'), __('700 bold','kahuna'), __('800 extra-bold','kahuna'), __('900 black','kahuna') ),
 		'desc' => '',
 	'section' => 'kahuna_fontfamily' ),
 	array(
@@ -913,8 +913,8 @@ $kahuna_big = array(
 	'id' => 'kahuna_fsitetitleweight',
 		'type' => 'select',
 		'label' => '',
-		'values' => array('300','400','700','800'),
-		'labels' => array( __('300 (ligher)','kahuna'), __('400 (normal)','kahuna'), __('700 (bold)','kahuna'), __('800 (bolder)','kahuna') ),
+		'values' => array('100', '200', '300', '400', '500', '600', '700', '800', '900'),
+		'labels' => array( __('100 thin','kahuna'), __('200 extra-light','kahuna'), __('300 ligher','kahuna'), __('400 regular','kahuna'), __('500 medium','kahuna'), __('600 semi-bold','kahuna'), __('700 bold','kahuna'), __('800 extra-bold','kahuna'), __('900 black','kahuna') ),
 		'desc' => '',
 	'section' => 'kahuna_fontheader' ),
 	array(
@@ -942,8 +942,8 @@ $kahuna_big = array(
 	'id' => 'kahuna_fmenuweight',
 		'type' => 'select',
 		'label' => '',
-		'values' => array('300','400','700','800'),
-		'labels' => array( __('300 (ligher)','kahuna'), __('400 (normal)','kahuna'), __('700 (bold)','kahuna'), __('800 (bolder)','kahuna') ),
+		'values' => array('100', '200', '300', '400', '500', '600', '700', '800', '900'),
+		'labels' => array( __('100 thin','kahuna'), __('200 extra-light','kahuna'), __('300 ligher','kahuna'), __('400 regular','kahuna'), __('500 medium','kahuna'), __('600 semi-bold','kahuna'), __('700 bold','kahuna'), __('800 extra-bold','kahuna'), __('900 black','kahuna') ),
 		'desc' => '',
 	'section' => 'kahuna_fontheader' ),
 	array(
@@ -971,8 +971,8 @@ $kahuna_big = array(
 	'id' => 'kahuna_fwtitleweight',
 		'type' => 'select',
 		'label' => '',
-		'values' => array('300','400','700','800'),
-		'labels' => array( __('300 (ligher)','kahuna'), __('400 (normal)','kahuna'), __('700 (bold)','kahuna'), __('800 (bolder)','kahuna') ),
+		'values' => array('100', '200', '300', '400', '500', '600', '700', '800', '900'),
+		'labels' => array( __('100 thin','kahuna'), __('200 extra-light','kahuna'), __('300 ligher','kahuna'), __('400 regular','kahuna'), __('500 medium','kahuna'), __('600 semi-bold','kahuna'), __('700 bold','kahuna'), __('800 extra-bold','kahuna'), __('900 black','kahuna') ),
 		'desc' => '',
 	'section' => 'kahuna_fontwidget' ),
 	array(
@@ -1000,8 +1000,8 @@ $kahuna_big = array(
 	'id' => 'kahuna_fwcontentweight',
 		'type' => 'select',
 		'label' => '',
-		'values' => array('300','400','700','800'),
-		'labels' => array( __('300 (ligher)','kahuna'), __('400 (normal)','kahuna'), __('700 (bold)','kahuna'), __('800 (bolder)','kahuna') ),
+		'values' => array('100', '200', '300', '400', '500', '600', '700', '800', '900'),
+		'labels' => array( __('100 thin','kahuna'), __('200 extra-light','kahuna'), __('300 ligher','kahuna'), __('400 regular','kahuna'), __('500 medium','kahuna'), __('600 semi-bold','kahuna'), __('700 bold','kahuna'), __('800 extra-bold','kahuna'), __('900 black','kahuna') ),
 		'desc' => '',
 	'section' => 'kahuna_fontwidget' ),
 	array(
@@ -1029,8 +1029,8 @@ $kahuna_big = array(
 	'id' => 'kahuna_ftitlesweight',
 		'type' => 'select',
 		'label' => '',
-		'values' => array('300','400','700','800'),
-		'labels' => array( __('300 (ligher)','kahuna'), __('400 (normal)','kahuna'), __('700 (bold)','kahuna'), __('800 (bolder)','kahuna') ),
+		'values' => array('100', '200', '300', '400', '500', '600', '700', '800', '900'),
+		'labels' => array( __('100 thin','kahuna'), __('200 extra-light','kahuna'), __('300 ligher','kahuna'), __('400 regular','kahuna'), __('500 medium','kahuna'), __('600 semi-bold','kahuna'), __('700 bold','kahuna'), __('800 extra-bold','kahuna'), __('900 black','kahuna') ),
 		'desc' => '',
 	'section' => 'kahuna_fontcontent' ),
 	array(
@@ -1058,8 +1058,8 @@ $kahuna_big = array(
 	'id' => 'kahuna_metatitlesweight',
 		'type' => 'select',
 		'label' => '',
-		'values' => array('300','400','700','800'),
-		'labels' => array( __('300 (ligher)','kahuna'), __('400 (normal)','kahuna'), __('700 (bold)','kahuna'), __('800 (bolder)','kahuna') ),
+		'values' => array('100', '200', '300', '400', '500', '600', '700', '800', '900'),
+		'labels' => array( __('100 thin','kahuna'), __('200 extra-light','kahuna'), __('300 ligher','kahuna'), __('400 regular','kahuna'), __('500 medium','kahuna'), __('600 semi-bold','kahuna'), __('700 bold','kahuna'), __('800 extra-bold','kahuna'), __('900 black','kahuna') ),
 		'desc' => '',
 	'section' => 'kahuna_fontcontent' ),
 	array(
@@ -1088,8 +1088,8 @@ $kahuna_big = array(
 	'id' => 'kahuna_fheadingsweight',
 		'type' => 'select',
 		'label' => '',
-		'values' => array('300','400','700','800'),
-		'labels' => array( __('300 (ligher)','kahuna'), __('400 (normal)','kahuna'), __('700 (bold)','kahuna'), __('800 (bolder)','kahuna') ),
+		'values' => array('100', '200', '300', '400', '500', '600', '700', '800', '900'),
+		'labels' => array( __('100 thin','kahuna'), __('200 extra-light','kahuna'), __('300 ligher','kahuna'), __('400 regular','kahuna'), __('500 medium','kahuna'), __('600 semi-bold','kahuna'), __('700 bold','kahuna'), __('800 extra-bold','kahuna'), __('900 black','kahuna') ),
 		'desc' => '',
 	'section' => 'kahuna_fontcontent' ),
 	array(
@@ -1450,7 +1450,7 @@ array(
 	'id' => 'kahuna_fheight',
 		'type' => 'number',
 		'label' => __( 'Featured Image Height (in pixels)', 'kahuna' ),
-		'desc' => '',
+		'desc' => __( 'Set to 0 to disable image processing', 'kahuna' ),
 	'section' => 'kahuna_featured' ),
 	array(
 	'id' => 'kahuna_fheight_notice',
@@ -1464,9 +1464,9 @@ array(
 	'id' => 'kahuna_fresponsive',
 		'type' => 'select',
 		'values' => array( 0 , 1 ),
-		'labels' => array( __("Cropped","kahuna"), __("Responsive","kahuna") ),
+		'labels' => array( __("Cropped","kahuna"), __("Contained","kahuna") ),
 		'label' => __('Featured Image Behaviour','kahuna'),
-		'desc' => __("<strong>Responsive</strong> will scale depending on the viewed resolution<br><strong>Cropped</strong> will always have the configured height.","kahuna"),
+		'desc' => __("<strong>Contained</strong> will scale depending on the viewed resolution<br><strong>Cropped</strong> will try to keep the configured height.","kahuna"),
 	'section' => 'kahuna_featured' ),
 	array(
 	'id' => 'kahuna_falign',

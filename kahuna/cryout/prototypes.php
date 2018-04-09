@@ -3,15 +3,22 @@
  * Framework prototypes
  *
  * @package Cryout Framework
- * @updated Cryout Framework 0.5.6
  */
 
 function cryout_sanitize_tn($input){
 	return preg_replace( '/[^a-z0-9-]/i', '-', $input );
 }
 
+function cryout_sanitize_tnl($input){
+	return ucwords(preg_replace( '/[^a-z0-9]/i', ' ', $input ));
+}
+
 function cryout_sanitize_tn_fn($input){
 	return preg_replace( '/[^a-z0-9]/i', '_', $input );
+}
+
+function cryout_sanitize_tnp($input){
+	return preg_replace( '/-[^-]*$/i', '', $input );
 }
 
 // needed by the theme options array
@@ -94,6 +101,36 @@ function cryout_get_option($subs = array()) {
 	}
 	return '';
 } // cyout_get_option()
+
+// performs options migration between versions
+function cryout_maybe_migrate_options( $options ) {
+	if (empty($options)) return false;
+	global ${_CRYOUT_THEME_NAME . '_big'};
+	$theme_structure = ${_CRYOUT_THEME_NAME . '_big'};
+	if (empty($theme_structure['migration'])) return $options;
+
+	$migrated = false;
+	if ( !empty( $options[_CRYOUT_THEME_NAME . '_db'] ) && !empty( $theme_structure['migration'] ) ) {
+		foreach ($theme_structure['migration'] as $version => $pairs) {
+			if ( (float)$version > (float)$options[_CRYOUT_THEME_NAME . '_db'] ) {
+			// cycle through migration sets
+			foreach ($pairs as $old_key => $new_key) {
+				if (isset($options[$old_key])) {
+					$options[$new_key] = $options[$old_key];
+					unset($options[$old_key]);
+				}
+			} // foreach pairs
+			$options[_CRYOUT_THEME_NAME . '_db'] = $version;
+			$migrated = true;
+			} // if ver
+		} // foreach migration
+	}
+	if ($migrated) {
+		delete_option( _CRYOUT_THEME_NAME . '_settings');
+		update_option( _CRYOUT_THEME_NAME . '_settings', $options );
+	}
+	return $options;
+} // cryout_maybe_migrate_options()
 
 /**
  * Checks if a value is logically true or false
@@ -289,7 +326,29 @@ function cryout_post_first_image( $postID, $size = 'cryout-featured' ) {
 	}
 }; // cryout_post_first_image()
 
-/** 
+/**
+ * Returns the needed image data array based on attachment ID
+ */
+function cryout_get_picture( $attachment_id, $size = '' ){
+	$image = wp_get_attachment_image_src( $attachment_id, $size );
+	if (!empty($image[0])) return $image;
+						  else return array(
+							0 => apply_filters( cryout_sanitize_tnp(_CRYOUT_THEME_NAME) . '_preview_img_src', ''),
+							1 => apply_filters( cryout_sanitize_tnp(_CRYOUT_THEME_NAME) . '_preview_img_w', ''),
+							2 => apply_filters( cryout_sanitize_tnp(_CRYOUT_THEME_NAME) . '_preview_img_h', ''),
+						  );
+} // cryout_get_picture()
+
+/**
+ * Returns the needed image src based on attachment ID
+ */
+function cryout_get_picture_src( $attachment_id, $size ='' ){
+	$image = cryout_get_picture( $attachment_id, $size );
+	if (!empty($image[0])) return $image[0];
+						  else return '';
+} // cryout_get_picture_src()
+
+/**
  * Manually generate required srcset with correct aspect ratio for the theme's featured image
  */
 function cryout_get_featured_srcset( $attachment_id, $sizes = array() ) {
@@ -299,7 +358,7 @@ function cryout_get_featured_srcset( $attachment_id, $sizes = array() ) {
 			$datas[$size] = $image;
 		}
 	}
-	 
+
 	$srcset = array();
 	foreach ($datas as $data) {
 		$src = $data[0];
@@ -307,20 +366,43 @@ function cryout_get_featured_srcset( $attachment_id, $sizes = array() ) {
 		$height = $data[2];
 		$srcset[] = "$src ${width}w";
 	}
-	
+
 	$srcset = implode(', ', $srcset);
-	
+
 	return $srcset;
 
 } // cryout_get_featured_srcset()
 
+/** 
+ * Returns featured image sizes for srcset functionality based on magazine layout option 
+ */
 function cryout_gen_featured_sizes( $default = 1440, $magazinelayout = false, $landingpage = false ) {
-	if ($magazinelayout>1) {
-		$column = floor( 100 / (int)$magazinelayout );
-		return "(max-width: 800px) 100vw,(max-width: 1152px) ${column}vw, ${default}px";
-	} else
-		return "(max-width: 800px) 100vw,(max-width: 1152px) 100vw, ${default}px";
+	if ( $landingpage ) {
+		$magazinelayout = apply_filters( cryout_sanitize_tnp( _CRYOUT_THEME_NAME ) . '_lppostslayout_filter', $magazinelayout );
+	};
+	if ( $magazinelayout > 1 ) {
+		$column =  50;
+	} else {
+		$column = 100;
+	};
+	return "(max-width: 800px) 100vw,(max-width: 1152px) ${column}vw, ${default}px";
 } // cryout_gen_featured_sizes()
+
+/**
+ * Detects if theme has landing page functionality enabled and active 
+ */
+function cryout_is_landingpage() {
+	$landingpage = cryout_get_option( cryout_sanitize_tnp( _CRYOUT_THEME_NAME ) . '_landingpage');
+	return ( $landingpage && ('page' == get_option( 'show_on_front' )) );
+} // cryout_is_landingpage()
+
+/** 
+ * Detects if the code currently executed is on the landing page and the landing page is enabled and active 
+ */
+function cryout_on_landingpage() {
+	$landingpage = cryout_get_option( cryout_sanitize_tnp( _CRYOUT_THEME_NAME ) . '_landingpage');
+	return ( $landingpage && ('page' == get_option( 'show_on_front' )) && is_front_page() );
+} // cryout_on_landingpage()
 
 /**
  * Outputs inline background image styling
@@ -376,9 +458,9 @@ function cryout_categories_for_customizer( $what = 0, $label_all = '', $label_of
 	$cats = get_categories();
 	$categories = array();
 	$labels = array();
-	if (count($cats>0)):
+	if ( count( $cats ) > 0 ):
 		if ($off) {
-			$categories[] = '-';
+			$categories[] = '-1';
 			$labels[] = $label_off;
 		};
 		if ($all) {
@@ -410,7 +492,7 @@ function cryout_categories_for_customizer( $what = 0, $label_all = '', $label_of
 function cryout_pages_for_customizer( $what = 0, $label_off = '', $off = TRUE ) {
 	$pages = array(); $labels = array();
 	$pags = get_pages( );
-	if (count($pags>0)):
+	if ( count( $pags ) > 0 ):
 		if ($off) {
 			$pages = array( 0 );
 			$labels = array( $label_off );
@@ -632,7 +714,7 @@ function cryout_schema_publisher() {
          </span>
          <meta itemprop="name" content="<?php esc_attr( bloginfo( 'name' ) ); ?>">
     </span>
-<?php 
+<?php
 }// cryout_schema_publisher()
 endif;
 // hooked in core.php
@@ -666,11 +748,16 @@ function cryout_breadcrumbs(
 			$text_404,
 			$text_format,
 			$text_page
-			) {
+) {
 
 	global $post;
 	$homeLink = home_url();
 	if ( is_front_page() || is_home() ) { return; }	// don't display breadcrumbs on the homepage (yet)
+
+	$exclude_templates = apply_filters( 'cryout_breadcrumbs_excluded_templates', array() );
+	if (!empty($exclude_templates)) foreach ($exclude_templates as $exclude_template) {
+		if (is_page_template( $exclude_template ) ) return; // don't display breadcrumbs on excluded page templates
+	}
 
 	// let's begin
 	echo sprintf( $wrapper_pre, $layout_class, cryout_schema_microdata( 'breadcrumbs', 0 ) );
@@ -803,10 +890,10 @@ class Cryout_Social_Menu_Walker extends Walker_Nav_Menu {
 		//$output .= $indent . '<li' . $id . $class_names .'>';
 
 		$atts = array();
-		$atts['title']  = ! empty( $item->attr_title ) ? $item->attr_title : '';
-		$atts['target'] = ! empty( $item->target )     ? $item->target     : '';
-		$atts['rel']    = ! empty( $item->xfn )        ? $item->xfn        : '';
-		$atts['href']   = ! empty( $item->url )        ? $item->url        : '';
+		$atts['title']  = ! empty( $item->attr_title ) ? esc_attr( $item->attr_title )	: '';
+		$atts['target'] = ! empty( $item->target )     ? esc_attr( $item->target )		: '';
+		$atts['rel']    = ! empty( $item->xfn )        ? esc_attr( $item->xfn ) 		: '';
+		$atts['href']   = ! empty( $item->url )        ? esc_url( $item->url )			: '';
 
 		// Filters the HTML attributes applied to a menu item's anchor element.
 		$atts = apply_filters( 'nav_menu_link_attributes', $atts, $item, $args, $depth );
@@ -851,6 +938,9 @@ class Cryout_Social_Menu_Walker extends Walker_Nav_Menu {
 
 } // Cryout_Social_Menu_Walker
 
+/* Polylang / WPML compatibility enhancements */
+
+// return localized post id
 function cryout_localize_id( $id ) {
 	if ( empty($id) ) return;
 	if ( function_exists('pll_get_post') )
@@ -860,6 +950,7 @@ function cryout_localize_id( $id ) {
 	return $id;
 } // cryout_localize_id()
 
+// return localized category id
 function cryout_localize_cat( $slug ) {
 	if (empty($slug)) return $slug;
 	$cat = get_category_by_slug( $slug );
@@ -868,15 +959,16 @@ function cryout_localize_cat( $slug ) {
 		return pll_get_term( $cat_id );
 	if ( function_exists('icl_object_id') )
 		return icl_object_id( $id ); // WMPL
-	return $cat_id;	
+	return $cat_id;
 } // cryout_localize_cat()
 
+// retrieve locale code
 function cryout_localize_code() {
 	if ( function_exists('pll_current_language') )
 		return pll_current_language(); // Polylang
 	if ( defined('ICL_LANGUAGE_CODE') )
 		return ICL_LANGUAGE_CODE; // WPML
-	return '';	
+	return '';
 } // cryout_localize_code()
 
 

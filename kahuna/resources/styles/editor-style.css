@@ -480,6 +480,11 @@ img.aligncenter {
 	display: none;
 }
 
+#tinymce pre, #tinymce span.crayon-inline, #tinymce pre.crayon-selected { 
+	background-color: rgba(0,0,0,0.1) !important;
+	border-color: rgba(0,0,0,0.2) !important; 
+}
+
 .rtl th {
 	text-align: right;
 }

@@ -62,6 +62,17 @@ jQuery(window).load(function(){
 			});
 
 		}); // each
+		
+		// Sortable control
+		jQuery('.customize-control-sortable .sortable-row').sortable({
+			update: function( event, ui ) {
+				var order = new Array();
+				jQuery(this).children('li').each(function() {
+					order.push(jQuery(this).attr("id"));
+				});
+				jQuery(this).parent().children('.the_sorted').val(order.join()).change();
+			}
+		}); // sortable
 
 	}); // setTimeout
 

@@ -32,7 +32,7 @@ add_action( 'cryout_post_excerpt_hook', 'kahuna_custom_excerpt_more', 10 );
  */
 function kahuna_continue_reading_link() {
 	$kahuna_excerptcont = cryout_get_option( 'kahuna_excerptcont' );
-	return '<a class="continue-reading-link" href="'. esc_url( get_permalink() ) . '"><span>' . wp_kses_post( $kahuna_excerptcont ). '</span></a>';
+	return '<a class="continue-reading-link" href="'. esc_url( get_permalink() ) . '"><span>' . wp_kses_post( $kahuna_excerptcont ). '<i class="icon-continue-reading"></i></span></a>';
 }
 add_filter( 'the_content_more_link', 'kahuna_continue_reading_link' );
 
@@ -276,13 +276,13 @@ endif;
  * Adds a post thumbnail and if one doesn't exist the first post image is returned
  * @uses cryout_get_first_image( $postID )
  */
-if ( ! function_exists( 'kahuna_set_featured_thumb' ) ) :
-function kahuna_set_featured_thumb() {
+if ( ! function_exists( 'kahuna_set_featured_srcset_picture' ) ) :
+function kahuna_set_featured_srcset_picture() {
 
 	global $post;
 	$options = cryout_get_option( array( 'kahuna_fpost', 'kahuna_fauto', 'kahuna_falign', 'kahuna_magazinelayout', 'kahuna_landingpage' ) );
 
-	switch ($options['kahuna_magazinelayout']) {
+	switch ( apply_filters( 'kahuna_lppostslayout_filter', $options['kahuna_magazinelayout'] ) ) {
 		case 3: $featured = 'kahuna-featured-third'; break;
 		case 2: $featured = 'kahuna-featured-half'; break;
 		case 1: default: $featured = 'kahuna-featured'; break;
@@ -293,37 +293,37 @@ function kahuna_set_featured_thumb() {
 
 	if ( function_exists('has_post_thumbnail') && has_post_thumbnail() && $options['kahuna_fpost']) {
 		// has featured image
-		$featured_image = wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ), $featured );
+		$featured_image = wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ), 'kahuna-featured' );
+		$fimage_id = get_post_thumbnail_id( $post->ID );
 	} elseif ( $options['kahuna_fpost'] && $options['kahuna_fauto'] && empty($featured_image) ) {
 		// get the first image from post
-		$featured_image = cryout_post_first_image( $post->ID, $featured );
+		$featured_image = cryout_post_first_image( $post->ID, 'kahuna-featured' );
+		$fimage_id = $featured_image['id'];
 	} else {
 		// featured image not enabled or not obtainable
 		$featured_image[0] = apply_filters('kahuna_preview_img_src', '');
 		$featured_image[1] = apply_filters('kahuna_preview_img_w', '');
 		$featured_image[2] = apply_filters('kahuna_preview_img_h', '');
+		$fimage_id = FALSE;
 	};
 
 	if ( ! empty( $featured_image[0] ) ) {
-		$featured_image_url = esc_url( $featured_image[0] );
-		$featured_image_w = $featured_image[1];
-		$featured_image_h = $featured_image[2]; ?>
+		$featured_width = kahuna_featured_width();
+		?>
 		<div class="post-thumbnail-container"  <?php cryout_schema_microdata( 'image' ); ?>>
 
-			<a href="<?php echo esc_url( get_permalink( $post->ID ) ) ?>" title="<?php echo esc_attr( get_post_field( 'post_title', $post->ID ) ) ?>"
-				<?php cryout_echo_bgimage( $featured_image_url, 'post-featured-image' ) ?>>
-
+			<a class="post-featured-image" href="<?php echo esc_url( get_permalink( $post->ID ) ) ?>" title="<?php echo esc_attr( get_post_field( 'post_title', $post->ID ) ) ?>"
+				<?php cryout_echo_bgimage( $featured_image[0], 'post-featured-image' ) ?>>
 			</a>
-			<img class="post-featured-image" alt="<?php the_title_attribute();?>" <?php cryout_schema_microdata( 'url' ); ?>
-				src="<?php echo $featured_image_url; ?>" srcset="<?php if ($use_srcset) echo cryout_get_featured_srcset(
-					get_post_thumbnail_id( $post->ID ),
-					array(  'kahuna-featured',
-							'kahuna-featured-full',
-							'kahuna-featured-half',
-							'kahuna-featured-third' )
-					) ?>" sizes="<?php if ($use_srcset) echo cryout_gen_featured_sizes( kahuna_featured_width(), $options['kahuna_magazinelayout'], $options['kahuna_landingpage'] ) ?>"/>
-			<meta itemprop="width" content="<?php echo absint( $featured_image_w ); ?>">
-			<meta itemprop="height" content="<?php echo absint( $featured_image_h ); ?>">
+			<picture class="responsive-featured-image">
+				<source media="(max-width: 1152px)" sizes="<?php echo cryout_gen_featured_sizes( $featured_width, $options['kahuna_magazinelayout'], $options['kahuna_landingpage'] ) ?>" srcset="<?php echo cryout_get_picture_src( $fimage_id, 'kahuna-featured-third' ); ?> 512w">
+				<source media="(max-width: 800px)" sizes="<?php echo cryout_gen_featured_sizes( $featured_width, $options['kahuna_magazinelayout'], $options['kahuna_landingpage'] ) ?>" srcset="<?php echo cryout_get_picture_src( $fimage_id, 'kahuna-featured-half' ); ?> 800w">
+				<?php if ( cryout_on_landingpage() ) { ?><source media="" sizes="<?php echo cryout_gen_featured_sizes( $featured_width, $options['kahuna_magazinelayout'], $options['kahuna_landingpage'] ) ?>" srcset="<?php echo cryout_get_picture_src( $fimage_id, 'kahuna-featured-lp' ); ?> <?php printf( '%sw', $featured_width ) ?>">
+				<?php } ?>
+				<img alt="<?php the_title_attribute();?>" <?php cryout_schema_microdata( 'url' ); ?> src="<?php echo cryout_get_picture_src( $fimage_id, 'kahuna-featured' ); ?>" />
+			</picture>
+			<meta itemprop="width" content="<?php echo $featured_image[1]; // width ?>">
+			<meta itemprop="height" content="<?php echo $featured_image[2]; // height ?>">
 			<div class="featured-image-overlay">
 				<div class="entry-meta featured-image-meta"><?php cryout_featured_meta_hook(); ?></div>
 				<a class="featured-image-link" href="<?php echo esc_url( get_permalink( $post->ID ) ) ?>" title="<?php echo esc_attr( get_post_field( 'post_title', $post->ID ) ) ?>"></a>
@@ -333,8 +333,8 @@ function kahuna_set_featured_thumb() {
 		} else { ?>
 		<div class="entry-meta featured-image-meta"><?php cryout_featured_meta_hook(); ?></div>
 		<?php }
-} // kahuna_set_featured_thumb()
+} // kahuna_set_featured_srcset_picture()
 endif;
-if ( cryout_get_option( 'kahuna_fpost' ) ) add_action( 'cryout_featured_hook', 'kahuna_set_featured_thumb' );
+if ( cryout_get_option( 'kahuna_fpost' ) ) add_action( 'cryout_featured_hook', 'kahuna_set_featured_srcset_picture' );
 
 /* FIN */

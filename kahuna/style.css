@@ -4,7 +4,7 @@ Theme URI: http://www.cryoutcreations.eu/wordpress-themes/kahuna
 Description: Kahuna is the big kahuna among WordPress themes. It proved itself with an exotic design, effective and easy to use customizer settings and a responsive, fully editable layout. Many personal and business sites have embraced it for a wide spectrum of uses, ranging from portfolio and photography sites to blogs and online shops. The features are too many to list but here are some of the main attractions: translatable, search engine optimized (both microformats and micordata), supports RTL (right-to-left) languages, supports eCommerce (WooCommerce), has both wide and boxed layouts, masonry bricks, socials, Google fonts, typography options, and a great customizable landing page.
 Author: Cryout Creations
 Author URI: http://www.cryoutcreations.eu
-Version: 1.0.1
+Version: 1.1.2
 License: GNU General Public License v3.0
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Tags: one-column, two-columns, three-columns, right-sidebar, left-sidebar, grid-layout, custom-background, custom-colors, custom-header, flexible-header, custom-menu, featured-image-header, featured-images, front-page-post-form, full-width-template, footer-widgets, microformats, post-formats, rtl-language-support, sticky-post, theme-options, threaded-comments, translation-ready, blog, entertainment, portfolio
@@ -698,7 +698,7 @@ a#logo > img {
 	overflow: hidden;
 	height: 100%;
 	top: 10px;
-	z-index: 99;
+	z-index: 10;
 }
 
 /*--------------------------------------------------------------
@@ -1506,7 +1506,7 @@ img#wpstats {
 }
 
 .main .entry-title {
-	margin: 0 1.5em 0 0;
+	margin: 0;
 }
 
 /*--------------------------------------------------------------
@@ -1616,7 +1616,6 @@ span.edit-link {
     right: 0.25em;
     top: 0.25em;
 	border-radius: 2px;
-	background: rgba(255,255,255,.5);
 	-webkit-transition: .3s opacity;
 	transition: .3s opacity;
 }
@@ -1630,6 +1629,10 @@ span.edit-link .icon-edit::before {
 
 span.edit-link:hover {
 	opacity: 1;
+}
+
+span.edit-link .icon-edit::before {
+	font-size: 0.8em;
 }
 
 .post-thumbnail-container .featured-image-overlay {
@@ -1672,7 +1675,7 @@ span.edit-link:hover {
 }
 
 .post-thumbnail-container .featured-image-link::before {
-	content: "\e948";
+	content: "\e917";
 	font-family: "iconmeta";
 	position: absolute;
 	z-index: 10;
@@ -1702,12 +1705,14 @@ span.edit-link:hover {
 	transform: translateX(50%);
 }
 
-.post-thumbnail-container:hover img {
+.post-thumbnail-container:hover picture,
+.post-thumbnail-container:hover .post-featured-image {
 	-webkit-transition: .3s all ease-out;
 	transition: .3s all ease-out;
 }
 
-.post-thumbnail-container:hover img {
+.post-thumbnail-container:hover picture,
+.post-thumbnail-container:hover .post-featured-image {
 	-webkit-filter: saturate(25%);
 	filter: saturate(25%);
 }
@@ -1751,6 +1756,7 @@ span.edit-link:hover {
 
 #header-page-title {
 	position: absolute;
+	z-index: 11;
 	right: 0;
 	top: 50%;
 	left: 0;
@@ -1831,6 +1837,9 @@ span.edit-link:hover {
 	display: block;
 	clear: both;
 	font-size: 1.2em;
+	opacity: 0;
+	-webkit-animation: .7s 1s animation-fadeIn forwards;
+	animation: .7s 1s animation-fadeIn forwards;
 }
 
 /*--------------------------------------------------------------
@@ -1956,14 +1965,14 @@ body:not(.single) article.hentry .post-thumbnail-container:hover::after {
 	opacity: 1;
 }
 
-article.hentry .post-thumbnail-container > a.responsive-featured-image {
+article.hentry .post-thumbnail-container > .responsive-featured-image {
 	display: inline-block;
 	margin: 0 auto;
 	width: 100%;
 	text-align: center;
 }
 
-.kahuna-cropped-featured .main .post-thumbnail-container img.post-featured-image {
+.kahuna-cropped-featured .main .post-thumbnail-container picture.responsive-featured-image {
 	display: none;
 }
 
@@ -2517,9 +2526,15 @@ body .main .wp-caption > a {
 	display: block;
 	width: 100%;
 	height: auto;
-	opacity: 0;
-	-webkit-animation: 1.0s animation-fadeIn-blur ease-out forwards;
-	animation: 1.0s animation-fadeIn-blur ease-out forwards;
+	/*opacity: 0;*/
+	-webkit-transform: translateZ(0);
+	-webkit-backface-visibility: hidden;
+	-webkit-perspective: 1000;
+	transform: translateZ(0);
+	backface-visibility: hidden;
+	perspective: 1000;
+	-webkit-animation: .75s animation-fadeIn ease-out forwards;
+	animation: .75s animation-fadeIn ease-out forwards;
 }
 
 .lp-staticslider .staticslider-caption,
@@ -2569,6 +2584,7 @@ body .main .wp-caption > a {
 }
 
 @-webkit-keyframes animation-fadeIn-blur {
+
 	0% {
 		opacity: 0;
 		-webkit-filter: blur(3px);
@@ -2584,9 +2600,11 @@ body .main .wp-caption > a {
 		-webkit-filter: blur(0);
 		filter: blur(0);
 	}
+
 }
 
 @keyframes animation-fadeIn-blur {
+
 	0% {
 		opacity: 0;
 		-webkit-filter: blur(3px);
@@ -2602,6 +2620,7 @@ body .main .wp-caption > a {
 		-webkit-filter: blur(0);
 		filter: blur(0);
 	}
+
 }
 
 .lp-staticslider .staticslider-caption-title,
@@ -3306,6 +3325,10 @@ a.staticslider-button + a.staticslider-button,
 	padding: 5em 0;
 }
 
+#lp-page #comments {
+	display: none;
+}
+
 /* AJAX LOAD MORE POSTS BUTTON */
 #cryout_ajax_more_trigger{
 	position: relative;
@@ -3667,13 +3690,11 @@ span.entry-sticky {
 .comment-author .author-name {
 	padding: 0 .8em;
 	font-size: 1em;
-	text-transform: uppercase;
 }
 
 .commentlist .author-name,
 .commentlist .author-name a {
 	font-weight: 400;
-	letter-spacing: 1px;
 }
 
 .comment-meta {
@@ -3700,12 +3721,7 @@ span.entry-sticky {
 .commentlist .bypostauthor {}
 
 .comment-await {
-	margin-left: 2em;
-}
-
-.comment .reply {
-	display: block;
-	overflow: hidden;
+	font-size: 0.9em;
 }
 
 .comment article {
@@ -3717,9 +3733,10 @@ span.entry-sticky {
 }
 
 .comment .reply {
-	display: inline-block;
-	float: right;
 	position: relative;
+	display: inline-block;
+	overflow: hidden;
+	float: right;
 	width: auto;
 	text-align: right;
 	line-height: 50px;
@@ -3728,7 +3745,7 @@ span.entry-sticky {
 }
 
 .comment .reply a {
-	padding: .2em 0;
+	padding: .1em 0;
 	font-weight: 700;
 	border-bottom: 3px solid transparent;
 	-webkit-transition: .2s all ease-out;
@@ -3742,10 +3759,15 @@ span.entry-sticky {
 .comment .reply i {
 	display: inline-block;
 	position: relative;
-	font-size: .6em;
-	padding: .2em 0;
-	margin-right: .4em;
+	font-size: .8em;
+	margin-right: .2em;
 	vertical-align: middle;
+	-webkit-transform: rotateX(180deg);
+	transform: rotateX(180deg);
+}
+
+.comment .reply i::before {
+	content: "\e947";
 }
 
 .commentlist .children {
@@ -3924,6 +3946,7 @@ span.entry-sticky {
 
 .widget-container ul ul {
 	margin-left: 1em;
+	margin-top: 1em;
 }
 
 .widget-container ul li {
@@ -4501,15 +4524,14 @@ a.continue-reading-link {
 
 i.icon-continue-reading {
 	position: relative;
-	top: 1px;
 	z-index: 1;
-	margin-left: .35em;
+	margin-left: 7px;
+	font-size: .6em;
 	-webkit-transition: all .2s ease-in-out;
 	transition: all .2s ease-in-out;
 }
 
 a.continue-reading-link:hover i.icon-continue-reading {
-	opacity: 0;
 }
 
 /* ## BLOCKQUOTES */
@@ -5138,7 +5160,7 @@ body.mobile .main {min-height:0;}
 
 @media (max-width: 720px) {
 
-	.lp-staticslider .lp-staticslider {
+	.lp-staticslider {
 		max-height: 70vmax;
 	}
 

@@ -32,9 +32,12 @@ function kahuna_comment( $comment, $args, $depth ) {
 
 				<article>
 					<div class="comment-body" <?php cryout_schema_microdata( 'text' ); ?>>
+						<?php if ( $comment->comment_approved == '0' ) : ?>
+							<span class="comment-await"><em><?php _e( 'Your comment is awaiting moderation.', 'kahuna' ); ?></em></span>
+						<?php endif; ?>
 						<?php comment_text(); ?>
 					</div>
-					<footer class="comment-header vcard">
+					<header class="comment-header vcard">
 
 						<div class="comment-author" <?php cryout_schema_microdata( 'comment-author' ); ?>>
 							<?php echo get_avatar( $comment, 50, '', '', array( 'extra_attr' => cryout_schema_microdata('image', 0) )  ); ?>
@@ -50,7 +53,7 @@ function kahuna_comment( $comment, $args, $depth ) {
 									printf(  '%1$s ' . __( 'at', 'kahuna' ) . ' %2$s', get_comment_date(),  get_comment_time() ); ?>
 								</span>
 								<span class="comment-timediff">
-									<?php printf( _x( '%s ago', '%s = human-readable time difference', 'kahuna' ), human_time_diff( get_comment_time( 'U' ), current_time( 'timestamp' ) ) ); ?>
+									<?php printf( _x( '%1$s ago', '%s = human-readable time difference', 'kahuna' ), human_time_diff( get_comment_time( 'U' ), current_time( 'timestamp' ) ) ); ?>
 								</span>
 
 							</time>
@@ -60,19 +63,13 @@ function kahuna_comment( $comment, $args, $depth ) {
 
 						<div class="reply">
 							<?php comment_reply_link( array_merge( $args, array(
-									'reply_text' 	=> '' . __( 'Reply', 'kahuna' ),
+									'reply_text' 	=> '<i class="icon-reply-comments"></i> ' . __( 'Reply', 'kahuna' ),
 									'depth'			=> $depth,
 									'max_depth'		=> $args['max_depth'] ) ) );
 							?>
 						</div><!-- .reply -->
 
-					</footer><!-- .comment-header .vcard -->
-
-					<?php if ( $comment->comment_approved == '0' ) : ?>
-						<span class="comment-await"><em><?php _e( 'Your comment is awaiting moderation.', 'kahuna' ); ?></em></span>
-						<br />
-					<?php endif; ?>
-
+					</header><!-- .comment-header .vcard -->
 				</article>
 		<?php
 		break;

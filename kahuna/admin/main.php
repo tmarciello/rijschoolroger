@@ -119,7 +119,7 @@ function kahuna_page_fn() {
 
 		<a class="button" href="customize.php" id="customizer"> <?php printf( __( 'Customize %s', 'kahuna' ), ucwords(_CRYOUT_THEME_NAME) ); ?> </a>
 
-		<div id="kahuna-export" >
+		<div id="kahuna-export">
 			<div>
 
 			<h3 class="hndle"><?php _e( 'Manage Theme Settings', 'kahuna' ); ?></h3>
@@ -134,7 +134,7 @@ function kahuna_page_fn() {
 	</div><!--lefty -->
 
 
-	<div id="righty" >
+	<div id="righty">
 		<div id="kahuna-donate" class="postbox donate">
 
 			<div class="inside">

@@ -42,7 +42,7 @@ function kahuna_setup() {
 	load_theme_textdomain( 'kahuna', get_template_directory() . '/languages' );
 	load_textdomain( 'cryout', '' );
 
-	// This theme allows users to set a custom backgrounssd
+	// This theme allows users to set a custom backgrounds
 	add_theme_support( 'custom-background' );
 
 	// This theme supports WordPress 4.5 logos
@@ -57,27 +57,34 @@ function kahuna_setup() {
 		'socials' => __( 'Social Icons', 'kahuna' ),
 	) );
 
-	$falign = explode( ' ', $options['kahuna_falign'] );
-	if (!is_array($falign)) $falign = array( 'center', 'center' ); //failsafe
+	$fheight = $options['kahuna_fheight'];
+	$falign = (bool)$options['kahuna_falign'];
+	if (false===$falign) {
+		$fheight = 0;
+	} else {
+		$falign = explode( ' ', $options['kahuna_falign'] );
+		if (!is_array($falign) ) $falign = array( 'center', 'center' ); //failsafe
+	}
 
 	// This theme uses post thumbnails
 	add_theme_support( 'post-thumbnails' );
 	set_post_thumbnail_size(
 		// default Post Thumbnail dimensions
 		apply_filters( 'kahuna_thumbnail_image_width', kahuna_featured_width() ),
-		apply_filters( 'kahuna_thumbnail_image_height', $options['kahuna_fheight'] )
+		apply_filters( 'kahuna_thumbnail_image_height', $options['kahuna_fheight'] ),
+		false
 	);
 	// Custom image size for use with post thumbnails
 	add_image_size( 'kahuna-featured',
-		ceil($options['kahuna_sitewidth']), //apply_filters( 'kahuna_featured_image_width', kahuna_featured_width() ),
+		apply_filters( 'kahuna_featured_image_width', kahuna_featured_width() ),
 		apply_filters( 'kahuna_featured_image_height', $options['kahuna_fheight'] ),
-		false
+		$falign
 	);
 
 	// Additional responsive image sizes
-	add_image_size( 'kahuna-featured-full',
-		apply_filters( 'kahuna_featured_image_full_width', ceil($options['kahuna_sitewidth']) ),
-		apply_filters( 'kahuna_featured_image_full_height', $options['kahuna_fheight'] ),
+	add_image_size( 'kahuna-featured-lp',
+		apply_filters( 'kahuna_featured_image_lp_width', ceil( $options['kahuna_sitewidth'] / apply_filters( 'kahuna_lppostslayout_filter', $options['kahuna_magazinelayout'] ) ) ),
+		apply_filters( 'kahuna_featured_image_lp_height', $options['kahuna_fheight'] ),
 		$falign
 	);
 	add_image_size( 'kahuna-featured-half',

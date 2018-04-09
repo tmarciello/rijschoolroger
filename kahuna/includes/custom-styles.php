@@ -10,7 +10,7 @@ function kahuna_body_classes( $classes ) {
 		'kahuna_landingpage', 'kahuna_layoutalign',  'kahuna_image_style', 'kahuna_magazinelayout', 'kahuna_comclosed', 'kahuna_contenttitles', 'kahuna_caption_style',
 		'kahuna_elementborder', 'kahuna_elementshadow', 'kahuna_elementborderradius', 'kahuna_totop', 'kahuna_menustyle', 'kahuna_menuposition', 'kahuna_menulayout',
 		'kahuna_headerresponsive', 'kahuna_fresponsive', 'kahuna_comlabels', 'kahuna_comdate', 'kahuna_tables', 'kahuna_normalizetags', 'kahuna_articleanimation',
-		'kahuna_headertitles_posts' , 'kahuna_headertitles_pages', 'kahuna_headertitles_archives',
+		'kahuna_headertitles_archives',
 	) );
 
 	if ( is_front_page() && $options['kahuna_landingpage'] && ('page' == get_option('show_on_front')) ) {
@@ -50,13 +50,11 @@ function kahuna_body_classes( $classes ) {
 	if ( $options['kahuna_comlabels'] == 1 ) $classes[] = 'kahuna-comment-placeholder';
 	if ( $options['kahuna_comdate'] == 1 ) $classes[] = 'kahuna-comment-date-published';
 
-	if ( ( is_single() && $options['kahuna_headertitles_posts'] ) ||
-		 ( is_page() && $options['kahuna_headertitles_pages'] ) ||
-         ( ( is_archive() || is_search() || is_404() ) && $options['kahuna_headertitles_archives'] ) ) $classes[] = 'kahuna-header-titles';
+	if ( kahuna_header_title_check() ) $classes[] = 'kahuna-header-titles';
+								 else $classes[] = 'kahuna-normal-titles';
 
 	$kahuna_archive_desc = trim( get_the_archive_description() ); // get_the_archive_description doesn't work with author description
 	if ( ( is_archive() || is_search() || is_404() ) && ! is_author() && $options['kahuna_headertitles_archives'] && empty( $kahuna_archive_desc ) ) $classes[] = 'kahuna-header-titles-nodesc';
-	//die($kahuna_archive_desc);
 
 	switch ( $options['kahuna_contenttitles'] ) {
 		case 2: $classes[] = 'kahuna-hide-page-title'; break;
@@ -179,8 +177,8 @@ html
 /*.post-thumbnail-container*/ .entry-meta > span { font-size: <?php echo esc_html( $kahuna_metatitlessize ) ?>; }
 .page-link, .pagination, #author-info #author-link, .comment .reply a, .comment-meta, .byline
 					{ font-family: <?php echo cryout_font_select( $kahuna_metatitles, $kahuna_metatitlesgoogle ) ?>; }
-/*.content-masonry .entry-title
- 	                { font-size: <?php echo esc_html( (int)$kahuna_ftitlessize * 0.7 ) ?>%; }*/
+.content-masonry .entry-title
+ 	                { font-size: <?php echo esc_html( (int)$kahuna_ftitlessize * 0.8 ) ?>%; }
 
 					  <?php
 $font_root = 2.6; // headings font size root
@@ -382,9 +380,10 @@ a.continue-reading-link, .continue-reading-link::after
 /* diffs */
 span.edit-link a.post-edit-link,
 span.edit-link a.post-edit-link:hover,
-span.edit-link .icon-edit:before			{ color: <?php echo esc_html( cryout_hexdiff( $kahuna_sitetext, 69) ) ?>; }
+span.edit-link .icon-edit:before			{ color: <?php echo esc_html( $kahuna_sitetext, 19 ) ?>; }
 
-.searchform 								{ border-color: <?php echo esc_html( cryout_hexdiff( $kahuna_contentbackground, 20) ) ?>; }
+.searchform 								{ border-color: <?php echo esc_html( cryout_hexdiff( $kahuna_contentbackground, 20 ) ) ?>; }
+#breadcrumbs-container 						{ background-color: <?php echo esc_html( cryout_hexdiff(  $kahuna_contentbackground, 7 ) ) ?>; }
 .entry-meta span, .entry-meta a, .entry-utility span, .entry-utility a, .entry-meta time,
 #breadcrumbs-nav, #header-page-title .byline, .footermenu ul li span.sep
 											{ color: <?php echo esc_html( cryout_hexdiff( $kahuna_sitetext, -69) ) ?>; }
@@ -508,7 +507,7 @@ nav#mobile-menu 							{ background-color: <?php echo esc_html( $kahuna_menuback
 											{ border-color: <?php echo esc_html( cryout_hexdiff( $kahuna_contentbackground, 22 ) ) ?>; }
 .kahuna-stripped-table .main tr:nth-child(even) td
 											{ background-color: <?php echo esc_html( cryout_hexdiff( $kahuna_contentbackground, 9 ) ) ?>; }
-<?php if ( $kahuna_fpost ) { ?>
+<?php if ( $kahuna_fpost && ( $kahuna_fheight > 0 ) ) { ?>
 .kahuna-cropped-featured .main .post-thumbnail-container
 											{ height: <?php echo esc_html( $kahuna_fheight ) ?>px; }
 .kahuna-responsive-featured .main .post-thumbnail-container
