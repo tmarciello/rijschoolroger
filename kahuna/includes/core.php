@@ -303,8 +303,8 @@ function kahuna_master_footer() {
 	do_action( 'cryout_footer_hook' );
 	echo '<div style="display:block;float:right;clear: right;">' . __( "Powered by", "kahuna" ) .
 		'<a target="_blank" href="' . esc_html( $kahuna_theme->get( 'ThemeURI' ) ) . '" title="';
-	echo 'Kahuna WordPress Theme by ' . 'Cryout Creations"> ' . 'Kahuna' .'</a> &amp; <a target="_blank" href="' . "http://wordpress.org/";
-	echo '" title="' . esc_attr__( "Semantic Personal Publishing Platform", "kahuna") . '"> ' . sprintf( " %s.", "WordPress" ) . '</a></div>';
+	echo 'Kahuna WordPress Theme by ' . 'Cryout Creations"> ' . 'Kahuna' .'</a> &amp; <a target="_blank" href="' . "https://www.linkedin.com/in/thmarciello/";
+	echo '" title="' . esc_attr__( "LinkedIn profile of Tiziana Marciello", "kahuna") . '"> ' . sprintf( " %s.", "Tiziana Marciello" ) . '</a></div>';
 }
 
 add_action( 'cryout_master_footer_hook', 'kahuna_copyright' );
